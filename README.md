@@ -176,3 +176,6 @@ To learn more about Odyssey, take a look at the following resources:
 - [Documentation](https://odyssey-docs-preview.vercel.app/) - learn about Odyssey API
 - [Odyssey AI](https://app.odysseyai.ai/) - use Odyssey AI App
 
+## Deployment
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FInteligemsLabs%2Fodyssey-example-nextjs-app&env=API_KEY,API_ENDPOINT&envDescription=Getting%20started&envLink=https%3A%2F%2Fgithub.com%2FInteligemsLabs%2Fodyssey-example-nextjs-app%3Ftab%3Dreadme-ov-file%23getting-started)
