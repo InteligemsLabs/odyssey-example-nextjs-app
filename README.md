@@ -9,7 +9,7 @@ API_KEY=
 API_ENDPOINT=https://app.odysseyai.ai
 ```
 
-[How to get API Key](http://localhost:3000)
+[How to get API Key](https://odyssey-docs-preview.vercel.app/docs/intro#getting-an-api-key)
 
 Install dependencies:
 
