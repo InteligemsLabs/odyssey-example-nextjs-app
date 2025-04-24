@@ -106,7 +106,7 @@ a {
   }
 }
 
-p {
+p:not(.chakra-text) {
   margin: 1rem 0;
 }
 
@@ -118,6 +118,91 @@ ul {
   max-width: 50%;
 }
 
+.chat-response h1,
+.chat-response h2,
+.chat-response h3,
+.chat-response h4,
+.chat-response h5,
+.chat-response h6 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.chat-response h1 {
+  font-size: 1.75rem;
+}
+
+.chat-response h2 {
+  font-size: 1.5rem;
+}
+
+.chat-response h3 {
+  font-size: 1.25rem;
+}
+
+.chat-response h4 {
+  font-size: 1.1rem;
+}
+
+.chat-response p:not(.chakra-text) {
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.chat-response code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.chat-response pre {
+  margin: 1rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 5px;
+}
+
 a:hover {
   color: #2C7A7B;
+}
+
+table {
+  display: block;
+  max-width: fit-content;
+  margin: 0 auto;
+  overflow-x: auto;
+  white-space: nowrap;
+  margin-bottom: 1rem;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.chat-response ol, .chat-response ul {
+  margin-left: 1em;
+  padding-left: 1em;
+  list-style-position: inside;
+}
+
+@media (max-width: 768px) {
+  .chat-response, .chat-message {
+    max-width: 100%;
+  }
 }

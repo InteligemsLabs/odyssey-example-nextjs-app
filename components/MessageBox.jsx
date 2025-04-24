@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Input, Button, Flex } from '@chakra-ui/react';
 
-const MessageBox = ({ onSendMessage }) => {
+const MessageBox = ({ onSendMessage, isLoading }) => {
   const [message, setMessage] = useState('');
 
   const handleSendMessage = () => {
@@ -22,7 +22,7 @@ const MessageBox = ({ onSendMessage }) => {
           }
         }}
       />
-      <Button ml={2} onClick={handleSendMessage} colorScheme="purple">
+      <Button ml={2} onClick={handleSendMessage} colorScheme="purple" isLoading={isLoading} disabled={isLoading}>
         Send
       </Button>
     </Flex>

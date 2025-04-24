@@ -10,7 +10,7 @@ const Messages = ({ messages }) => {
         if (msg.type === 'query') {
           return <UserMessage key={index} message={msg.text} />;
         } else {
-          return <ChatResponse key={index} message={msg.text} />;
+          return <ChatResponse key={index} message={msg} />;
         }
       })}
     </VStack>

@@ -7,6 +7,7 @@ import LoginAs from './LoginAs';
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
   const [teamMembers, setTeamMembers] = useState(null);
   const [userId, setUserId] = useState(null);
   const [workspaceId, setWorkspaceId] = useState(null);
@@ -22,31 +23,53 @@ const Chat = () => {
       return;
     }
 
+    setSendingMessage(true);
     const newMessages = [...messages, { type: 'query', text: message }];
     setMessages(newMessages);
   
-    const response = await fetch('/api/chat/message', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        userId: userId,
-      },
-      body: JSON.stringify({
-        workspaceId: workspaceId,
-        conversationId: activeConversation,
-        message: message,
-      }),
-    });
-  
-    if (response.ok) {
-      const data = await response.json();
-  
-      const newMessage = {
-        type: 'response',
-        text: data.data.response,
-      };
-  
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    try {
+      const response = await fetch('/api/chat/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          userId: userId,
+        },
+        body: JSON.stringify({
+          workspaceId: workspaceId,
+          conversationId: activeConversation,
+          message: message,
+        }),
+      });
+    
+      if (response.ok) {
+        const data = await response.json();
+    
+        const newMessage = {
+          type: 'response',
+          text: data.data.response,
+          ...data.data
+        };
+    
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      } else {
+        toast({
+          title: "Message failed to send",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Error sending message",
+        description: "Please try again later",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setSendingMessage(false);
     }
   };
 
@@ -86,6 +109,7 @@ const Chat = () => {
         const newMessages = data.data.map((message) => ({
           type: message.type,
           text: message.response || message.query,
+          ...message
         }));
 
         setMessages(newMessages);
@@ -152,7 +176,7 @@ const Chat = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setConversations(data.conversations);
+        setConversations(data.conversations?.reverse());
       }
     }
 
@@ -174,6 +198,69 @@ const Chat = () => {
 
     fetchTeamMembers();
   }, []);
+
+  // Function to create a new conversation
+  const createNewConversation = async () => {
+    if (!workspaceId || !userId) {
+      toast({
+        title: "Cannot create conversation",
+        description: "Workspace or user information missing",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/conversations?workspaceId=${workspaceId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          userId: userId,
+        },
+        body: JSON.stringify({
+          name: `New Chat ${new Date().toLocaleString()}`
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Add the new conversation to the list
+        setConversations([data.conversation, ...conversations]);
+        
+        // Set the new conversation as active using the correct property
+        setMessages([]);
+        setActiveConversation(data.conversationId);
+        
+        toast({
+          title: "New conversation created",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Failed to create conversation",
+          description: errorData.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      toast({
+        title: "Error creating conversation",
+        description: "Please try again later",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   const ChatContent = () => {
     if (!userId) {
@@ -243,12 +330,28 @@ const Chat = () => {
 
   return (
     <Flex height="100vh" bg="gray.900">
-      <Box width="250px" bg="gray.900" p={4} boxShadow="md">
-        <Heading as="h4" size="md" mb={4} color="white">
-          Conversations
-        </Heading>
+      <Box minWidth="250px" width="250px" bg="gray.900" p={4} boxShadow="md">
+        <Flex justifyContent="space-between" alignItems="center" mb={4}>
+          <Heading as="h4" size="md" color="white">
+            Conversations
+          </Heading>
+          {userId && (
+            <Box 
+              as="button"
+              bg="purple.500"
+              color="white"
+              px={3}
+              py={1}
+              borderRadius="md"
+              _hover={{ bg: "purple.600" }}
+              onClick={createNewConversation}
+            >
+              New
+            </Box>
+          )}
+        </Flex>
         <VStack align="flex-start" spacing={2} color="white">
-          {conversations?.map((conversation) => (
+          {conversations?.slice(0, 15).map((conversation) => (
             <div colorScheme='white' variant='link' size='xs' style={{
               cursor: 'pointer',
               fontWeight: activeConversation === conversation.conversationid ? 'bold' : 'normal',
@@ -269,12 +372,14 @@ const Chat = () => {
 
       <ChatContent />
 
-      <Flex direction="column" flex="1" height="100vh" bg="gray.100">
+      <Flex direction="column" flex="1" height="100vh" bg="gray.100" style={{
+        width: 'calc(100% - 250px)'
+      }}>
           <Box py={3} px={5} bg="white" boxShadow="md" style={{
             borderBottom: '1px solid #ddd',
           }}>
             <Heading as="h3" size="lg">
-              Odyssey Chat App
+              Odyssey Example Application
             </Heading>
           </Box>
           <Flex
@@ -288,7 +393,7 @@ const Chat = () => {
             <Messages messages={messages} />
           </Flex>
           {activeConversation && <Box p={5} bg="white" boxShadow="md">
-            <MessageBox onSendMessage={handleSendMessage} />
+            <MessageBox onSendMessage={handleSendMessage} isLoading={sendingMessage} />
           </Box>}
         </Flex>
       </Flex>
